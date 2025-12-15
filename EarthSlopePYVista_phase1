@@ -1,0 +1,101 @@
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+# Coordenadas 3D de los puntos clave
+points = {
+    "base1_piso": (0, 0, -20),
+    "base1": (0, 0, 0),
+    "base1_talud": (0, -15, -20),
+    "base1_talud_medio": (0, -7.5, -10),
+    "base2_piso": (136, 0, -20),
+    "base2": (136, 0, 0),
+    "base2_talud": (136, -15, -20),
+    "base2_talud_medio": (136, -7.5, -10),
+    "A": (34, 0, 0),
+    "B": (34, -4.5, -11.2),
+    "C": (34, -13.2, -17.6),
+    "D": (102, 0, 0),
+    "E": (102, -4, -10),
+    "F": (102, -12, -16)
+}
+
+# Extraer coordenadas
+xs, ys, zs = zip(*points.values())
+
+# Crear figura 3D
+fig = plt.figure(figsize=(12, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# Dibujar puntos
+ax.scatter(xs, ys, zs, color='blue', s=50)
+
+# Función para conectar puntos con línea
+def plot_line(p1, p2, color, label=None, lw=2):
+    x, y, z = zip(points[p1], points[p2])
+    ax.plot(x, y, z, color=color, linewidth=lw, label=label)
+
+# Líneas principales
+talud_q1 = ["base1", "A", "B", "C"]
+talud_q3 = ["base2", "D", "E", "F"]
+for talud, color in zip([talud_q1, talud_q3], ['green', 'red']):
+    x, y, z = zip(*[points[p] for p in talud])
+    ax.plot(x, y, z, color=color, linewidth=2)
+
+# Otras conexiones
+plot_line("C", "F", 'purple', 'C-F')
+plot_line("B", "E", 'orange', 'B-E')
+plot_line("A", "D", 'brown', 'A-D')
+
+plot_line("base1", "base1_talud", 'cyan', 'Base1 to Talud')
+plot_line("base2", "base2_talud", 'magenta', 'Base2 to Talud')
+
+plot_line("base1_talud_medio", "B", 'blue', 'Base1 Medio to B')
+plot_line("base2_talud_medio", "E", 'darkgreen', 'Base2 Medio to E')
+
+plot_line("base1_talud", "C", 'darkcyan', 'Base1 Talud to C')
+plot_line("base2_talud", "F", 'darkmagenta', 'Base2 Talud to F')
+
+plot_line("base1_talud", "base2_talud", 'black', 'Base1 Talud to Base2 Talud')
+
+plot_line("base1", "base1_piso", 'orange', 'Base1 to Base1 Piso')
+plot_line("base1_piso", "base2_piso", 'orange', 'Base1 Piso to Base2 Piso')
+plot_line("base2_piso", "base2", 'orange', 'Base2 Piso to Base2')
+plot_line("base2_piso", "base2_talud", 'cyan', 'Base2 Piso to Base2 Talud')
+plot_line("base1_piso", "base1_talud", 'cyan', 'Base1 Piso to Base1 Talud')
+
+# Definir caras para pintar el área interna
+faces = [
+    ["base1_piso", "base2_piso", "base2_talud", "base1_talud"],  # Piso inferior
+    ["base1", "base1_talud", "C", "B", "A"],                     # Talud izquierdo
+    ["base2", "base2_talud", "F", "E", "D"],                     # Talud derecho
+    ["base1", "base1_piso", "base2_piso", "base2"],              # Base superior piso
+    ["B", "C", "F", "E"],                                        # Conexión interna
+    ["A", "B", "E", "D"],                                        # Conexión interna
+    ["base1", "base1_piso", "base1_talud"],                      # Base1 zona lateral
+    ["base2", "base2_piso", "base2_talud"],                      # Base2 zona lateral
+    ["C", "F", "base2_talud", "base1_talud"]                     # Nueva cara solicitada
+]
+
+# Pintar caras
+for face in faces:
+    verts = [points[pt] for pt in face]
+    poly = Poly3DCollection([verts], alpha=0.6, facecolor='saddlebrown', edgecolor='k')
+    ax.add_collection3d(poly)
+
+# Etiquetar puntos
+for label, (x, y, z) in points.items():
+    ax.text(x, y, z, label, fontsize=9, color='black')
+
+# Configurar ejes y título
+ax.set_xlabel('X (ft)')
+ax.set_ylabel('Y (ft)')
+ax.set_zlabel('Z (ft)')
+ax.set_title('Modelo 3D del Talud con Área Interna Coloreada')
+
+# Leyenda
+#ax.legend(loc='upper left')
+
+plt.tight_layout()
+plt.show()
