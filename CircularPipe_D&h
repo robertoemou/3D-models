@@ -1,0 +1,67 @@
+"""
+Modelo 3D de tubería con pendiente y volumen de agua (visualización con PyVista)
+Guarda el modelo en el Escritorio y lo abre dentro de Python.
+"""
+
+import os
+import numpy as np
+import pyvista as pv
+from math import pi, cos, sin
+
+# === PARÁMETROS ===
+D = 0.31
+R = D / 2
+h_up = 0.025
+S = 0.003
+L = 2.0
+nx = 60
+ntheta = 80
+nr = 12
+
+# === GEOMETRÍA ===
+xs = np.linspace(0, L, nx)
+thetas = np.linspace(0, 2*pi, ntheta, endpoint=False)
+rs = np.linspace(0, R, nr)
+
+# --- TUBERÍA ---
+pipe_points = []
+pipe_faces = []
+for i, x in enumerate(xs):
+    for theta in thetas:
+        y = R * cos(theta)
+        z = R * sin(theta)
+        pipe_points.append([x, y, z])
+
+for i in range(nx - 1):
+    for j in range(ntheta):
+        a = i*ntheta + j
+        b = i*ntheta + (j + 1) % ntheta
+        c = (i + 1)*ntheta + (j + 1) % ntheta
+        d = (i + 1)*ntheta + j
+        pipe_faces.extend([3, a, b, c, 3, a, c, d])
+
+pipe_mesh = pv.PolyData(np.array(pipe_points), np.array(pipe_faces))
+
+# --- AGUA ---
+water_points = []
+water_faces = []
+for ix, x in enumerate(xs):
+    z_plane = -R + h_up + S * x
+    for ir, r in enumerate(rs):
+        for it, theta in enumerate(thetas):
+            y = r * cos(theta)
+            z = r * sin(theta)
+            if z <= z_plane:
+                water_points.append([x, y, z])
+
+water_points = np.array(water_points)
+water_mesh = pv.PolyData(water_points)
+
+# === VISUALIZACIÓN ===
+plotter = pv.Plotter()
+plotter.add_mesh(pipe_mesh, color="white", show_edges=True, edge_color="black", opacity=1)
+plotter.add_mesh(water_mesh, color="#5c3317", opacity=0.9)  # chocolate brown
+plotter.add_axes()
+plotter.show_grid()
+plotter.add_title("Tubería con pendiente y volumen de agua", font_size=12)
+plotter.show()
