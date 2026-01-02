@@ -4,7 +4,7 @@
 #from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 #Puntos Clave
-points = {
+#points = {
     "base1_piso": (0, 0, -20),
     "base1": (0, 0, 0),
     "base1_talud": (0, -15, -20),
@@ -22,11 +22,11 @@ points = {
 }
 
 # Extraer coordenadas
-xs, ys, zs = zip(*points.values())
+#xs, ys, zs = zip(*points.values())
 
 # Crear figura 3D
-fig = plt.figure(figsize=(12, 8))
-ax = fig.add_subplot(111, projection='3d')
+#fig = plt.figure(figsize=(12, 8))
+#ax = fig.add_subplot(111, projection='3d')
 
 # Dibujar puntos
 ax.scatter(xs, ys, zs, color='blue', s=50)
