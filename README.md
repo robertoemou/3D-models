@@ -1,5 +1,4 @@
-# Simple 3D-models
-3D models prev used based on field measures
+# Previewsly used 3D-models based on field measures
 
 <img width="1009" height="463" alt="Figurita" src="https://github.com/user-attachments/assets/b626ae51-65fc-4097-9ec4-cc3df978efc5" />
 Img 1. 3D pipe with D and h as reference points.
